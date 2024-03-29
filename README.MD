@@ -3,6 +3,7 @@
 </p>
 <p align="center">
 <img src="https://github.com/9yo/dynamicapi/actions/workflows/tests.yml/badge.svg" />
+<img src="https://img.shields.io/pypi/v/dynoapi?color=%2334D058&label=pypi%20package" alt="PyPi Version"/>
 </p>
 <p align="center">
 <img src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue" />
