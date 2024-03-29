@@ -1,0 +1,104 @@
+[tool.poetry]
+name = "dynamicapi"
+version = "0.1.0"
+description = ""
+authors = ["Artem Bogdanov <abogdaov@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pydantic = "^2.6.4"
+fastapi = "^0.110.0"
+
+[tool.poetry.group.examples.dependencies]
+uvicorn = "^0.29.0"
+
+[tool.poetry.group.postgres_storage.dependencies]
+sqlalchemy = "^2.0.29"
+asyncpg = "^0.29.0"
+
+[tool.poetry.group.tests.dependencies]
+pytest = "^8.1.1"
+pytest-asyncio = "^0.23.6"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.mypy]
+plugins = [
+    "pydantic.mypy"
+]
+
+follow_imports = "silent"
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_any_generics = true
+check_untyped_defs = true
+no_implicit_reexport = true
+disallow_untyped_defs = true
+pretty = true
+show_column_numbers = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+[tool.ruff]
+select = ["E", "F", "TID252"]
+ignore = []
+fixable = ["ALL"]
+unfixable = []
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "build",
+    "dist",
+]
+line-length = 88
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+target-version = "py311"
+
+[tool.ruff.extend-per-file-ignores]
+"*/**/__init__.py" = ["F401", "F403"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "parents"
+
+
+[tool.isort]
+src_paths = ["src", "app", "tests"]
+py_version = 311
+line_length = 88
+profile = "black"
+from_first = false
+multi_line_output = 3
+include_trailing_comma = true
+split_on_trailing_comma = true
+color_output = true
+use_parentheses = true
+atomic = true
+combine_as_imports = true
+combine_star = true
+group_by_package = true
+honor_noqa = true
+remove_redundant_aliases = true
+indent = '    '
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
