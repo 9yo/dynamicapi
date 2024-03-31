@@ -4,9 +4,9 @@ import pytest
 from fastapi import APIRouter
 from pydantic import create_model
 
-from src.entities.config import Config
-from src.implementations.builders.crud import CRUDBuilder
-from src.interfaces.storages import IStorageManager, IStorage
+from dyapi.entities.config import Config
+from dyapi.implementations.builders.crud import CRUDBuilder
+from dyapi.interfaces.storages import IStorageManager, IStorage
 
 # Mock dependencies
 MockEndpointBuilder = Mock()

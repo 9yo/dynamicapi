@@ -2,13 +2,13 @@ from typing import Type
 
 from fastapi import APIRouter
 
-from src.entities.config import Config
-from src.entities.endpoint_settings import EndpointSettings
-from src.entities.model_settings import ModelSettings
-from src.interfaces.builders.crud import ICRUDBuilder
-from src.interfaces.builders.endpoint import IEndpointBuilder
-from src.interfaces.builders.model import IModelBuilder
-from src.interfaces.storages import IStorageManager
+from dyapi.entities.config import Config
+from dyapi.entities.endpoint_settings import EndpointSettings
+from dyapi.entities.model_settings import ModelSettings
+from dyapi.interfaces.builders.crud import ICRUDBuilder
+from dyapi.interfaces.builders.endpoint import IEndpointBuilder
+from dyapi.interfaces.builders.model import IModelBuilder
+from dyapi.interfaces.storages import IStorageManager
 
 
 class CRUDBuilder(ICRUDBuilder):

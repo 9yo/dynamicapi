@@ -3,7 +3,7 @@ from typing import Type
 
 from pydantic import BaseModel
 
-from src.entities.config import Config
+from dyapi.entities.config import Config
 
 
 class IModelBuilder(ABC):

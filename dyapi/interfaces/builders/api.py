@@ -2,9 +2,9 @@ from abc import ABC, abstractmethod
 
 from fastapi import APIRouter
 
-from src.entities.config import Config
-from src.interfaces.builders.crud import ICRUDBuilder
-from src.interfaces.storages import IStorageManager
+from dyapi.entities.config import Config
+from dyapi.interfaces.builders.crud import ICRUDBuilder
+from dyapi.interfaces.storages import IStorageManager
 
 
 class IAPIBuilder(ABC):

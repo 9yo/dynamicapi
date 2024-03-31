@@ -2,10 +2,10 @@ from typing import Any, Callable
 
 from fastapi import Body, Depends, HTTPException
 
-from src.entities.endpoint_settings import EndpointSettings
-from src.entities.pagination import PaginationContainer, PaginationEntity
-from src.implementations.storages.exceptions import AlreadyExistsError, NotFoundError
-from src.interfaces.builders.endpoint import IEndpointBuilder
+from dyapi.entities.endpoint_settings import EndpointSettings
+from dyapi.entities.pagination import PaginationContainer, PaginationEntity
+from dyapi.implementations.storages.exceptions import AlreadyExistsError, NotFoundError
+from dyapi.interfaces.builders.endpoint import IEndpointBuilder
 
 
 class NotFoundException(HTTPException):

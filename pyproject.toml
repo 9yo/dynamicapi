@@ -1,13 +1,11 @@
 [tool.poetry]
-name = "dynoapi"
-version = "0.1.0"
+name = "dyapi"
+version = "0.2.0"
 description = ""
 authors = ["Artem Bogdanov <abogdaov@gmail.com>"]
 readme = "README.md"
+packages = [{ include = "dyapi", from = "." }]
 
-[[tool.poetry.packages]]
-include = "src"
-from = "."
 
 [tool.poetry.dependencies]
 python = "^3.11"

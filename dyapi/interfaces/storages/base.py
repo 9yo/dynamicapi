@@ -3,7 +3,7 @@ from typing import Type
 
 from pydantic import BaseModel
 
-from src.entities.pagination import PaginationEntity
+from dyapi.entities.pagination import PaginationEntity
 
 __all__ = ("IStorage",)
 

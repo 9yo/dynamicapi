@@ -6,8 +6,8 @@ from fastapi import FastAPI
 from sqlalchemy import URL, MetaData
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
-from src.implementations.builders.api import APIBuilder
-from src.implementations.storages.postgres.manager import PostgresStorageManager
+from dyapi.implementations.builders.api import APIBuilder
+from dyapi.implementations.storages.postgres.manager import PostgresStorageManager
 
 from .config import configs
 

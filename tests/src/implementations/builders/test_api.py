@@ -3,11 +3,11 @@ from unittest.mock import MagicMock
 import pytest
 from fastapi import APIRouter
 
-from src.entities.config import Config
-from src.implementations.builders.api import APIBuilder
-from src.interfaces.builders.crud import ICRUDBuilder
-from src.interfaces.builders.model import IModelBuilder
-from src.interfaces.storages import IStorageManager
+from dyapi.entities.config import Config
+from dyapi.implementations.builders.api import APIBuilder
+from dyapi.interfaces.builders.crud import ICRUDBuilder
+from dyapi.interfaces.builders.model import IModelBuilder
+from dyapi.interfaces.storages import IStorageManager
 
 # Mock dependencies
 MockCRUDBuilder = MagicMock(spec=ICRUDBuilder)

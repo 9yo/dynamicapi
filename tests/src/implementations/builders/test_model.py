@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
-from src.entities.config import Config, ConfigField
-from src.implementations.builders.model import ModelBuilder
+from dyapi.entities.config import Config, ConfigField
+from dyapi.implementations.builders.model import ModelBuilder
 
 # Sample ConfigField and Config objects for testing
 test_field_1 = ConfigField(name="field1", type=int, location="path")

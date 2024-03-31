@@ -73,7 +73,7 @@ To get started with this framework:
 
 ```python
 # examples/config.py
-from src.entities.config import Config, ConfigField
+from dyapi.entities.config import Config, ConfigField
 
 configs: list[Config] = [
     Config(

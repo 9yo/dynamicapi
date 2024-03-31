@@ -2,8 +2,8 @@ from typing import Type
 
 from pydantic import BaseModel, create_model
 
-from src.entities.config import Config, ConfigField
-from src.interfaces.builders.model import IModelBuilder
+from dyapi.entities.config import Config, ConfigField
+from dyapi.interfaces.builders.model import IModelBuilder
 
 
 class ModelBuilder(IModelBuilder):

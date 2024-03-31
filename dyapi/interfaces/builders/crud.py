@@ -3,10 +3,10 @@ from typing import Type
 
 from fastapi import APIRouter
 
-from src.entities.config import Config
-from src.interfaces.builders.endpoint import IEndpointBuilder
-from src.interfaces.builders.model import IModelBuilder
-from src.interfaces.storages import IStorageManager
+from dyapi.entities.config import Config
+from dyapi.interfaces.builders.endpoint import IEndpointBuilder
+from dyapi.interfaces.builders.model import IModelBuilder
+from dyapi.interfaces.storages import IStorageManager
 
 
 class ICRUDBuilder(ABC):

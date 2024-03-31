@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Float, Integer, MetaData, String, Table, UniqueConstraint
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from src.entities.config import Config, ConfigField
-from src.entities.model_settings import ModelSettings
-from src.interfaces.storages import IStorage, IStorageManager
+from dyapi.entities.config import Config, ConfigField
+from dyapi.entities.model_settings import ModelSettings
+from dyapi.interfaces.storages import IStorage, IStorageManager
 
 from .base import PostgresStorage
 

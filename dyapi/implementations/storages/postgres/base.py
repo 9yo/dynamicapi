@@ -6,9 +6,9 @@ from sqlalchemy import Table
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from src.entities.pagination import PaginationEntity
-from src.implementations.storages.exceptions import AlreadyExistsError, NotFoundError
-from src.interfaces.storages import IStorage
+from dyapi.entities.pagination import PaginationEntity
+from dyapi.implementations.storages.exceptions import AlreadyExistsError, NotFoundError
+from dyapi.interfaces.storages import IStorage
 
 __all__ = ["PostgresStorage"]
 

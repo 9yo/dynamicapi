@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
-from src.entities.config import Config
-from src.entities.model_settings import ModelSettings
-from src.interfaces.storages.base import IStorage
+from dyapi.entities.config import Config
+from dyapi.entities.model_settings import ModelSettings
+from dyapi.interfaces.storages.base import IStorage
 
 
 class IStorageManager(ABC):

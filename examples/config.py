@@ -1,4 +1,4 @@
-from src.entities.config import Config, ConfigField
+from dyapi.entities.config import Config, ConfigField
 
 configs: list[Config] = [
     Config(

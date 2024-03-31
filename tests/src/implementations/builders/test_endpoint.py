@@ -2,9 +2,9 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from src.entities.endpoint_settings import EndpointSettings
-from src.implementations.builders.endpoint import EndpointBuilder, NotFoundException, AlreadyExistsException
-from src.implementations.storages.exceptions import AlreadyExistsError, NotFoundError
+from dyapi.entities.endpoint_settings import EndpointSettings
+from dyapi.implementations.builders.endpoint import EndpointBuilder, NotFoundException, AlreadyExistsException
+from dyapi.implementations.storages.exceptions import AlreadyExistsError, NotFoundError
 from tests.src.implementations.builders.test_crud import entity_model
 
 # Create a mock for the storage with AsyncMock

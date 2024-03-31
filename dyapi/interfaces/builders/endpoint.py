@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Callable
 
-from src.entities.endpoint_settings import EndpointSettings
+from dyapi.entities.endpoint_settings import EndpointSettings
 
 
 class IEndpointBuilder(ABC):
