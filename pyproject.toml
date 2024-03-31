@@ -18,6 +18,8 @@ uvicorn = "^0.29.0"
 [tool.poetry.group.postgres_storage.dependencies]
 sqlalchemy = "^2.0.29"
 asyncpg = "^0.29.0"
+greenlet = "^3.0.3"
+
 
 [tool.poetry.group.tests.dependencies]
 pytest = "^8.1.1"
