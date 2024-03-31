@@ -6,13 +6,8 @@ import pytest
 from pydantic import create_model
 
 from dyapi.entities.pagination import PaginationEntity
-from dyapi.implementations.builders.endpoint import EndpointBuilder, AlreadyExistsException, NotFoundException
-from dyapi.implementations.builders.model import ModelBuilder
+from dyapi.implementations.builders.endpoint import AlreadyExistsException, NotFoundException
 from dyapi.implementations.storages.exceptions import AlreadyExistsError, NotFoundError
-from dyapi.interfaces.storages import IStorage
-
-
-
 
 
 def raise_not_found_error(*args, **kwargs):
@@ -76,7 +71,7 @@ class TestEndpointBuilder:
             field1="test"
         ), model(
             field1="test"
-        )]
+        )], 2
         container = await endpoint(
             path=MagicMock(),
             pagination=PaginationEntity(
