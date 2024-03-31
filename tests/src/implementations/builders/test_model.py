@@ -1,41 +1,44 @@
 from pydantic import BaseModel
 
-from dyapi.entities.config import Config, ConfigField
-from dyapi.implementations.builders.model import ModelBuilder
-
-# Sample ConfigField and Config objects for testing
-test_field_1 = ConfigField(name="field1", type=int, location="path")
-test_field_2 = ConfigField(name="field2", type=str, location="body")
-test_config = Config(name="Test", api_tags=["tag1"], fields=[test_field_1, test_field_2])
+from dyapi import ConfigField
 
 
-def test_create_model():
-    TestModel = ModelBuilder.create_model("TestModel", [test_field_1, test_field_2], optional=False)
-    assert issubclass(TestModel, BaseModel)
-    assert "field1" in TestModel.__fields__
-    assert "field2" in TestModel.__fields__
+class TestModelBuilder:
+    def test_create_model(self, model_builder):
+        model = model_builder.create_model(
+            "TestModel",
+            fields=[
+                ConfigField(
+                    name="field1",
+                    type=str,
+                ),
+            ],
 
+        )
+        assert issubclass(model, BaseModel)
+        assert model.__name__ == "TestModel"
+        assert model.model_fields['field1'].annotation == str
 
-def test_build_path():
-    PathModel = ModelBuilder.build_path(test_config)
-    assert issubclass(PathModel, BaseModel)
-    assert "field1" in PathModel.__fields__
+    def test_path_model(self, model_builder):
+        model = model_builder.path
+        assert issubclass(model, BaseModel)
+        assert model.__name__.startswith("PathModel")
+        assert model.model_fields['field1'].annotation == int
 
+    def test_body_model(self, model_builder):
+        model = model_builder.body
+        assert issubclass(model, BaseModel)
+        assert model.__name__.startswith("BodyModel")
+        assert model.model_fields == {}
 
-def test_build_optional_path():
-    OptionalPathModel = ModelBuilder.build_optional_path(test_config)
-    assert issubclass(OptionalPathModel, BaseModel)
-    assert "field1" in OptionalPathModel.__fields__
+    def test_query_model(self, model_builder):
+        model = model_builder.query
+        assert issubclass(model, BaseModel)
+        assert model.__name__.startswith("QueryModel")
+        assert model.model_fields['field1'].annotation == int | None
 
-
-def test_build_body():
-    BodyModel = ModelBuilder.build_body(test_config)
-    assert issubclass(BodyModel, BaseModel)
-    assert "field2" in BodyModel.__fields__
-
-
-def test_build_entity():
-    EntityModel = ModelBuilder.build_entity(test_config)
-    assert issubclass(EntityModel, BaseModel)
-    assert "field1" in EntityModel.__fields__
-    assert "field2" in EntityModel.__fields__
+    def test_entity_model(self, model_builder):
+        model = model_builder.entity
+        assert issubclass(model, BaseModel)
+        assert model.__name__.startswith("EntityModel")
+        assert model.model_fields['field1'].annotation == int

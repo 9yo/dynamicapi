@@ -1,9 +1,7 @@
+from dyapi.entities.config import Config, ConfigField
+from dyapi.interfaces.storages import IStorage, IStorageManager
 from sqlalchemy import Column, Float, Integer, MetaData, String, Table, UniqueConstraint
 from sqlalchemy.ext.asyncio import AsyncEngine
-
-from dyapi.entities.config import Config, ConfigField
-from dyapi.entities.model_settings import ModelSettings
-from dyapi.interfaces.storages import IStorage, IStorageManager
 
 from .base import PostgresStorage
 
@@ -35,11 +33,11 @@ class PostgresStorageManager(IStorageManager):
             self.metadata,
             *[self.generate_column(field) for field in config.fields],
             UniqueConstraint(
-                *[field.name for field in config.fields if field.location == "path"]
+                *[field.name for field in config.path_fields],
             ),
         )
 
-    def get_storage(self, config: Config, settings: ModelSettings) -> IStorage:
+    def storage(self, config: Config) -> IStorage:
         return PostgresStorage(
             pg_engine=self.pg_engine,
             table=self.build_table(config),

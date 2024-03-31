@@ -1,26 +1,56 @@
 from abc import ABC, abstractmethod
+from functools import cached_property
 from typing import Any, Callable
 
-from dyapi.entities.endpoint_settings import EndpointSettings
+from dyapi.interfaces.builders.model import IModelBuilder
+from dyapi.interfaces.storages import IStorage
 
 
 class IEndpointBuilder(ABC):
-    @staticmethod
     @abstractmethod
-    def create_endpoint(settings: EndpointSettings) -> Callable[[Any], Any]: ...
+    def __init__(self, model: IModelBuilder, storage: IStorage): ...
 
-    @staticmethod
+    @cached_property
     @abstractmethod
-    def get_endpoint(settings: EndpointSettings) -> Callable[[Any], Any]: ...
+    def create(self) -> Callable[[Any], Any]:
+        """
+        Returns FastAPI endpoint for creating a new entity.
+        :return:
+        """
+        pass
 
-    @staticmethod
+    @cached_property
     @abstractmethod
-    def update_endpoint(settings: EndpointSettings) -> Callable[[Any], Any]: ...
+    def get(self) -> Callable[[Any], Any]:
+        """
+        Returns FastAPI endpoint for getting an entity.
+        :return:
+        """
+        ...
 
-    @staticmethod
+    @cached_property
     @abstractmethod
-    def delete_endpoint(settings: EndpointSettings) -> Callable[[Any], Any]: ...
+    def update(self) -> Callable[[Any], Any]:
+        """
+        Returns FastAPI endpoint for updating an entity.
+        :return:
+        """
+        ...
 
-    @staticmethod
+    @cached_property
     @abstractmethod
-    def list_endpoint(settings: EndpointSettings) -> Callable[[Any], Any]: ...
+    def delete(self) -> Callable[[Any], Any]:
+        """
+        Returns FastAPI endpoint for deleting an entity.
+        :return:
+        """
+        ...
+
+    @cached_property
+    @abstractmethod
+    def list(self) -> Callable[[Any], Any]:
+        """
+        Returns FastAPI endpoint for listing entities.
+        :return:
+        """
+        ...

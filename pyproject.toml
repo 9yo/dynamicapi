@@ -106,3 +106,6 @@ honor_noqa = true
 remove_redundant_aliases = true
 indent = '    '
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

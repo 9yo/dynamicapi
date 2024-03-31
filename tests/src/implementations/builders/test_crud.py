@@ -1,61 +1,39 @@
-from unittest.mock import Mock
+from unittest.mock import MagicMock
 
 import pytest
-from fastapi import APIRouter
-from pydantic import create_model
 
-from dyapi.entities.config import Config
+from dyapi import Config
 from dyapi.implementations.builders.crud import CRUDBuilder
-from dyapi.interfaces.storages import IStorageManager, IStorage
-
-# Mock dependencies
-MockEndpointBuilder = Mock()
-MockModelBuilder = Mock()
-MockStorageManager = Mock(spec=IStorageManager)
-
-path_model = create_model("PathModel", id=(int, ...))
-body_model = create_model("BodyModel", name=(str, ...), age=(int, ...))
-entity_model = create_model("EntityModel", id=(int, ...), name=(str, ...), age=(int, ...))
-optional_path_model = create_model("OptionalPathModel", id=(int | None, ...))
-
-# Setting up the mock model builder to return mock model settings
-MockModelBuilder.build_path.return_value = path_model
-MockModelBuilder.build_body.return_value = body_model
-MockModelBuilder.build_entity.return_value = entity_model
-MockModelBuilder.build_optional_path.return_value = optional_path_model
-
-MockStorageManager.get_storage.return_value = Mock(spec=IStorage)
-
-# Sample configuration
-config = Config(name="TestEntity", api_tags=["test"], fields=[])
+from dyapi.implementations.builders.endpoint import EndpointBuilder
+from dyapi.implementations.builders.model import ModelBuilder
+from dyapi.interfaces.storages import IStorageManager
 
 
 # Create a test instance of CRUDBuilder
-@pytest.fixture
-def crud_builder():
-    return CRUDBuilder(
-        config=config,
-        storage_manager=MockStorageManager,
-        endpoint_builder=MockEndpointBuilder,
-        model_builder=MockModelBuilder
-    )
 
+class TestCRUDBuilder:
+    def test_generate_path_from_fields(self):
+        assert CRUDBuilder.generate_path_from_fields(["field1", "field2"]) == "{field1}/{field2}"
 
-def test_crud_builder_initialization(crud_builder):
-    assert crud_builder.api_tags == config.api_tags
-    assert crud_builder.settings.config == config
-    # Add more assertions related to the initialization
+    def test_config(self, crud_builder):
+        assert isinstance(crud_builder.config, Config)
 
+    def test_model(self, crud_builder):
+        assert isinstance(crud_builder.model, ModelBuilder)
 
-def test_generate_path_from_fields(crud_builder):
-    fields = ["id", "name"]
-    expected_path = "{id}/{name}"
-    assert crud_builder.generate_path_from_fields(fields) == expected_path
+    def test_endpoint(self, crud_builder):
+        assert isinstance(crud_builder.endpoint, EndpointBuilder)
 
-
-def test_crud_builder_router(crud_builder):
-    router = crud_builder.router
-    assert isinstance(router, APIRouter)
-    # Verify that the correct number of routes have been added
-    assert len(router.routes) == 5
-    # Further assertions can be made to check the specific endpoints and methods
+    def test_router(self, crud_builder):
+        router = crud_builder.router
+        assert len(router.routes) == 5
+        assert router.routes[0].path == "/"
+        assert router.routes[0].methods == {"POST"}
+        assert router.routes[1].path == "/"
+        assert router.routes[1].methods == {"GET"}
+        assert router.routes[2].path == "/{field1}"
+        assert router.routes[2].methods == {"GET"}
+        assert router.routes[3].path == "/{field1}"
+        assert router.routes[3].methods == {"PUT"}
+        assert router.routes[4].path == "/{field1}"
+        assert router.routes[4].methods == {"DELETE"}

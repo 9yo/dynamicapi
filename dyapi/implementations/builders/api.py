@@ -1,6 +1,5 @@
-from typing import Type
-
-from fastapi import APIRouter
+from functools import cached_property
+from typing import Dict, Type
 
 from dyapi.entities.config import Config
 from dyapi.implementations.builders.crud import CRUDBuilder
@@ -11,6 +10,7 @@ from dyapi.interfaces.builders.crud import ICRUDBuilder
 from dyapi.interfaces.builders.endpoint import IEndpointBuilder
 from dyapi.interfaces.builders.model import IModelBuilder
 from dyapi.interfaces.storages import IStorageManager
+from fastapi import APIRouter
 
 
 class APIBuilder(IAPIBuilder):
@@ -28,20 +28,33 @@ class APIBuilder(IAPIBuilder):
         self.endpoint_builder = endpoint_builder
         self.model_builder = model_builder
 
-    @property
-    def router(self) -> APIRouter:
-        router = APIRouter()
-
-        for config in self.configs:
-            crud_router = self.crud_builder(
+    @cached_property
+    def cruds(self) -> Dict[str, ICRUDBuilder]:
+        return {
+            config.name: self.crud_builder(
                 config=config,
                 storage_manager=self.storage_manager,
                 endpoint_builder=self.endpoint_builder,
                 model_builder=self.model_builder,
-            ).router
+            )
+            for config in self.configs
+        }
 
+    @cached_property
+    def models(self) -> Dict[str, IModelBuilder]:
+        return {
+            config.name: self.model_builder(config=config) for config in self.configs
+        }
+
+    @cached_property
+    def router(self) -> APIRouter:
+        router = APIRouter()
+
+        for builder in self.cruds.values():
             router.include_router(
-                crud_router, prefix=f"/{config.name}", tags=config.api_tags
+                router=builder.router,
+                prefix=f"/{builder.config.name}",
+                tags=builder.config.api_tags,
             )
 
         return router

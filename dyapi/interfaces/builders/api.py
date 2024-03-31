@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
-
-from fastapi import APIRouter
+from functools import cached_property
 
 from dyapi.entities.config import Config
 from dyapi.interfaces.builders.crud import ICRUDBuilder
+from dyapi.interfaces.builders.model import IModelBuilder
 from dyapi.interfaces.storages import IStorageManager
+from fastapi import APIRouter
 
 
 class IAPIBuilder(ABC):
@@ -16,6 +17,14 @@ class IAPIBuilder(ABC):
         crud_builder: ICRUDBuilder,
     ): ...
 
-    @property
+    @cached_property
     @abstractmethod
-    def router(self) -> list[APIRouter]: ...
+    def router(self) -> APIRouter: ...
+
+    @cached_property
+    @abstractmethod
+    def models(self) -> dict[str, IModelBuilder]: ...
+
+    @cached_property
+    @abstractmethod
+    def cruds(self) -> dict[str, ICRUDBuilder]: ...

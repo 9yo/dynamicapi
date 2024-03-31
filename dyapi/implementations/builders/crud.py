@@ -1,10 +1,9 @@
+from functools import cached_property
 from typing import Type
 
 from fastapi import APIRouter
 
 from dyapi.entities.config import Config
-from dyapi.entities.endpoint_settings import EndpointSettings
-from dyapi.entities.model_settings import ModelSettings
 from dyapi.interfaces.builders.crud import ICRUDBuilder
 from dyapi.interfaces.builders.endpoint import IEndpointBuilder
 from dyapi.interfaces.builders.model import IModelBuilder
@@ -19,57 +18,44 @@ class CRUDBuilder(ICRUDBuilder):
         endpoint_builder: Type[IEndpointBuilder],
         model_builder: Type[IModelBuilder],
     ):
-        self.model = ModelSettings(
-            path=model_builder.build_path(config),
-            body=model_builder.build_body(config),
-            entity=model_builder.build_entity(config),
-            optional_path=model_builder.build_optional_path(config),
-        )
-        self.settings = EndpointSettings(
-            config=config,
+        self._config = config
+        self._model = model_builder(config=config)
+        self._endpoint = endpoint_builder(
             model=self.model,
-            storage=storage_manager.get_storage(config=config, settings=self.model),
+            storage=storage_manager.storage(config=config),
         )
-        self.api_tags = config.api_tags
-        self.endpoint_builder = endpoint_builder
 
-    def generate_path_from_fields(self, fields: list[str]) -> str:
+    @staticmethod
+    def generate_path_from_fields(fields: list[str]) -> str:
         return "/".join(["{" + field + "}" for field in fields])
 
-    @property
+    @cached_property
+    def config(self) -> Config:
+        return self._config
+
+    @cached_property
+    def model(self) -> IModelBuilder:
+        return self._model
+
+    @cached_property
+    def endpoint(self) -> IEndpointBuilder:
+        return self._endpoint
+
+    @cached_property
     def router(self) -> APIRouter:
-        router = APIRouter(tags=self.api_tags)
+        router = APIRouter()
 
         path: str = self.generate_path_from_fields(
-            [field.name for field in self.settings.config.path_fields]
+            [field.name for field in self.config.path_fields]
         )
-        router.add_api_route(
-            "/",
-            self.endpoint_builder.create_endpoint(settings=self.settings),
-            methods=["POST"],
-        )
+        router.add_api_route("/", self.endpoint.create, methods=["POST"])
 
-        router.add_api_route(
-            f"/{path}",
-            self.endpoint_builder.get_endpoint(settings=self.settings),
-            methods=["GET"],
-        )
+        router.add_api_route("/", self.endpoint.list, methods=["GET"])
 
-        router.add_api_route(
-            f"/{path}",
-            self.endpoint_builder.update_endpoint(settings=self.settings),
-            methods=["PUT"],
-        )
+        router.add_api_route(f"/{path}", self.endpoint.get, methods=["GET"])
 
-        router.add_api_route(
-            f"/{path}",
-            self.endpoint_builder.delete_endpoint(settings=self.settings),
-            methods=["DELETE"],
-        )
+        router.add_api_route(f"/{path}", self.endpoint.update, methods=["PUT"])
 
-        router.add_api_route(
-            "/",
-            self.endpoint_builder.list_endpoint(settings=self.settings),
-            methods=["GET"],
-        )
+        router.add_api_route(f"/{path}", self.endpoint.delete, methods=["DELETE"])
+
         return router

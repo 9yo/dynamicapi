@@ -55,6 +55,5 @@ configs: list[Config] = [
             ConfigField(name="amount_due", type=float, location="body"),
             ConfigField(name="payment_status", type=str, location="body"),
         ],
-    )
-
+    ),
 ]

@@ -2,7 +2,7 @@ from typing import Any, Type
 
 from asyncpg import UniqueViolationError
 from pydantic import BaseModel
-from sqlalchemy import Table
+from sqlalchemy import Table, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncEngine
 
@@ -76,7 +76,7 @@ class PostgresStorage(IStorage):
         filter_: BaseModel,
         pagination: PaginationEntity,
         response_model: Type[BaseModel],
-    ) -> list[BaseModel]:
+    ) -> tuple[list[BaseModel], int]:
         filter_stmnts = [
             getattr(self.table.c, key) == value
             for key, value in filter_.dict().items()
@@ -89,6 +89,16 @@ class PostgresStorage(IStorage):
                 .limit(pagination.limit)
                 .offset(pagination.offset)
             )
+
+            total_count_query = select(
+                func.count()
+            ).select_from(self.table).where(*filter_stmnts)
+
             result = await conn.execute(query)
             result = result.fetchall()
-            return [self.row_to_entity(row, response_model) for row in result]
+
+            total_count = await conn.execute(total_count_query)
+
+            return [
+                self.row_to_entity(row, response_model) for row in result
+            ], total_count.fetchone()[0]
