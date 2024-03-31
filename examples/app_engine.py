@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 import uvicorn
-from dyapi import APIBuilder, PostgresStorageManager
+from dyapi import APIBuilder, PostgresEngineStorageManager
 from fastapi import FastAPI
 from sqlalchemy import URL, MetaData
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
@@ -33,7 +33,7 @@ async def lifespan(
     app: FastAPI,
 ) -> AsyncGenerator[None, None]:
     engine = get_postgres_engine()
-    storage_manager = PostgresStorageManager(pg_engine=engine, metadata=metadata)
+    storage_manager = PostgresEngineStorageManager(pg_engine=engine, metadata=metadata)
 
     api_builder = APIBuilder(configs=configs, storage_manager=storage_manager)
     example_router = api_builder.router
@@ -53,4 +53,6 @@ async def lifespan(
 application = FastAPI(lifespan=lifespan)
 
 if __name__ == "__main__":
-    uvicorn.run("examples.app:application", host="0.0.0.0", port=8001, reload=True)
+    uvicorn.run(
+        "examples.app_engine:application", host="0.0.0.0", port=8001, reload=True
+    )

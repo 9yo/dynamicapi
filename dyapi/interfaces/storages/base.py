@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Type
 
-from pydantic import BaseModel
-
 from dyapi.entities.pagination import PaginationEntity
+from pydantic import BaseModel
 
 __all__ = ("IStorage",)
 

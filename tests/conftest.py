@@ -12,5 +12,4 @@ __all__ = [
     "model_builder",
     "endpoint_builder",
     "postgres_storage",
-
 ]

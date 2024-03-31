@@ -1,19 +1,17 @@
-from unittest.mock import MagicMock
-
-import pytest
-
 from dyapi import Config
 from dyapi.implementations.builders.crud import CRUDBuilder
 from dyapi.implementations.builders.endpoint import EndpointBuilder
 from dyapi.implementations.builders.model import ModelBuilder
-from dyapi.interfaces.storages import IStorageManager
-
 
 # Create a test instance of CRUDBuilder
 
+
 class TestCRUDBuilder:
     def test_generate_path_from_fields(self):
-        assert CRUDBuilder.generate_path_from_fields(["field1", "field2"]) == "{field1}/{field2}"
+        assert (
+            CRUDBuilder.generate_path_from_fields(["field1", "field2"])
+            == "{field1}/{field2}"
+        )
 
     def test_config(self, crud_builder):
         assert isinstance(crud_builder.config, Config)

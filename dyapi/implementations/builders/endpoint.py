@@ -1,13 +1,12 @@
 from functools import cached_property
 from typing import Any, Callable
 
-from fastapi import Body, Depends, HTTPException
-
 from dyapi.entities.pagination import PaginationContainer, PaginationEntity
 from dyapi.implementations.storages.exceptions import AlreadyExistsError, NotFoundError
 from dyapi.interfaces.builders.endpoint import IEndpointBuilder
 from dyapi.interfaces.builders.model import IModelBuilder
 from dyapi.interfaces.storages import IStorage
+from fastapi import Body, Depends, HTTPException
 
 
 class NotFoundException(HTTPException):

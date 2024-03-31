@@ -1,5 +1,4 @@
 import pytest
-
 from dyapi.implementations.builders.model import ModelBuilder
 
 

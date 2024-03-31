@@ -3,11 +3,13 @@ from typing import Callable
 from unittest.mock import MagicMock
 
 import pytest
-from pydantic import create_model
-
 from dyapi.entities.pagination import PaginationEntity
-from dyapi.implementations.builders.endpoint import AlreadyExistsException, NotFoundException
+from dyapi.implementations.builders.endpoint import (
+    AlreadyExistsException,
+    NotFoundException,
+)
 from dyapi.implementations.storages.exceptions import AlreadyExistsError, NotFoundError
+from pydantic import create_model
 
 
 def raise_not_found_error(*args, **kwargs):
@@ -63,20 +65,16 @@ class TestEndpointBuilder:
     async def test_list_endpoint(self, endpoint_builder):
         endpoint = endpoint_builder.list
         assert isinstance(endpoint, Callable)
-        model = create_model(
-            "TestModel",
-            field1=(str, ...)
-        )
-        endpoint_builder.storage.list.return_value = [model(
-            field1="test"
-        ), model(
-            field1="test"
-        )], 2
+        model = create_model("TestModel", field1=(str, ...))
+        endpoint_builder.storage.list.return_value = [
+            model(field1="test"),
+            model(field1="test"),
+        ], 2
         container = await endpoint(
             path=MagicMock(),
             pagination=PaginationEntity(
                 offset=0,
                 limit=10,
-            )
+            ),
         )
         assert len(container.data) == 2

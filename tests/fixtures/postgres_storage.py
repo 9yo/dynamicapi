@@ -1,13 +1,12 @@
 from unittest.mock import MagicMock
 
 import pytest
-
-from dyapi.implementations.storages.postgres.base import PostgresStorage
+from dyapi.implementations.storages.postgres.base import PostgresEngineStorage
 
 
 @pytest.fixture
 def postgres_storage():
-    return PostgresStorage(
+    return PostgresEngineStorage(
         pg_engine=MagicMock(),
         table=MagicMock(),
     )
