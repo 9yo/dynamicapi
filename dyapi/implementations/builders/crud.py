@@ -1,12 +1,16 @@
 from functools import cached_property
-from typing import Type
+from typing import AsyncContextManager, Type
 
 from dyapi.entities.config import Config
+from dyapi.implementations.builders.endpoint import SQLAlchemyEndpointBuilder
 from dyapi.interfaces.builders.crud import ICRUDBuilder
 from dyapi.interfaces.builders.endpoint import IEndpointBuilder
 from dyapi.interfaces.builders.model import IModelBuilder
 from dyapi.interfaces.storages import IStorageManager
 from fastapi import APIRouter
+from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import DeclarativeBase
 
 
 class CRUDBuilder(ICRUDBuilder):
@@ -47,6 +51,55 @@ class CRUDBuilder(ICRUDBuilder):
         path: str = self.generate_path_from_fields(
             [field.name for field in self.config.path_fields]
         )
+        router.add_api_route("/", self.endpoint.create, methods=["POST"])
+
+        router.add_api_route("/", self.endpoint.list, methods=["GET"])
+
+        router.add_api_route(f"/{path}", self.endpoint.get, methods=["GET"])
+
+        router.add_api_route(f"/{path}", self.endpoint.update, methods=["PUT"])
+
+        router.add_api_route(f"/{path}", self.endpoint.delete, methods=["DELETE"])
+
+        return router
+
+
+class SQLAlchemyCRUDBuilder:
+    def __init__(
+        self,
+        db_model: Type[DeclarativeBase],
+        db_session: AsyncContextManager[AsyncSession],
+        schema: Type[BaseModel],
+        update_schema: Type[BaseModel],
+        path_schema: Type[BaseModel],
+        filter_schema: Type[BaseModel],
+    ):
+        """
+
+        :param db_model:
+        :param db_session:
+        :param update_schema:
+        """
+        self.endpoint = SQLAlchemyEndpointBuilder(
+            db_model=db_model,
+            db_session=db_session,
+            schema=schema,
+            path_schema=path_schema,
+            filter_schema=filter_schema,
+            update_schema=update_schema,
+        )
+
+    @cached_property
+    def router(self) -> APIRouter:
+        router = APIRouter()
+
+        path: str = "/".join(
+            [
+                "{" + field + "}"
+                for field in self.endpoint.path_schema.model_fields.keys()
+            ]
+        )
+
         router.add_api_route("/", self.endpoint.create, methods=["POST"])
 
         router.add_api_route("/", self.endpoint.list, methods=["GET"])

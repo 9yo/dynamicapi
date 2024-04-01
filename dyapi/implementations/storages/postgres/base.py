@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from sqlalchemy import Table, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
+from sqlalchemy.orm import DeclarativeBase
 
 __all__ = ["PostgresEngineStorage"]
 
@@ -118,3 +119,82 @@ class PostgresSessionStorage(PostgresEngineStorage):
         session = self.get_session()
         async with session.begin():
             return await session.execute(query)
+
+
+class SQLAlchemyStorage:
+    @staticmethod
+    async def create(
+        model: DeclarativeBase,
+        session: AsyncSession,
+    ) -> DeclarativeBase:
+        try:
+            session.add(model)
+            await session.flush()
+        except IntegrityError as exc:
+            await session.rollback()
+            if exc.orig.sqlstate == UniqueViolationError.sqlstate:
+                raise AlreadyExistsError from exc
+        return model
+
+    @staticmethod
+    async def get(
+        model_type: Type[DeclarativeBase],
+        session: AsyncSession,
+        filter_: BaseModel,
+    ) -> DeclarativeBase:
+        query = select(model_type).filter_by(**filter_.model_dump())
+        model = (await session.execute(query)).fetchone()
+        if model is None:
+            raise NotFoundError
+        return model[0]
+
+    @classmethod
+    async def update(
+        cls,
+        model_type: Type[DeclarativeBase],
+        session: AsyncSession,
+        filter_: BaseModel,
+        body: BaseModel,
+    ) -> DeclarativeBase:
+        model: model_type = await cls.get(  # type: ignore
+            model_type=model_type, session=session, filter_=filter_
+        )
+        for key, value in body.model_dump().items():
+            setattr(model, key, value)
+
+        await session.flush()
+        return model
+
+    @staticmethod
+    async def delete(
+        model_type: Type[DeclarativeBase],
+        session: AsyncSession,
+        filter_: BaseModel,
+    ) -> bool:
+        model = await SQLAlchemyStorage.get(model_type, session, filter_)
+        await session.delete(model)
+        await session.flush()
+        return True
+
+    @staticmethod
+    async def list(
+        model_type: Type[DeclarativeBase],
+        session: AsyncSession,
+        filter_: BaseModel,
+        pagination: PaginationEntity,
+    ) -> tuple[list[DeclarativeBase], int]:
+        query = select(model_type)
+        total_count_query = select(func.count()).select_from(model_type)
+
+        filter_data = filter_.model_dump(exclude_none=True)
+
+        if filter_data:
+            query = query.filter_by(**filter_data)
+            total_count_query = total_count_query.filter_by(**filter_data)
+
+        query = query.limit(pagination.limit).offset(pagination.offset)
+
+        result = (await session.execute(query)).fetchall()
+        total_count = (await session.execute(total_count_query)).fetchone()[0]
+
+        return [row[0] for row in result], total_count
