@@ -73,6 +73,8 @@ class SQLAlchemyCRUDBuilder:
         update_schema: Type[BaseModel],
         path_schema: Type[BaseModel],
         filter_schema: Type[BaseModel],
+        api_tags: list[str] | None = None,
+        api_prefix: str = "",
     ):
         """
 
@@ -80,6 +82,8 @@ class SQLAlchemyCRUDBuilder:
         :param db_session:
         :param update_schema:
         """
+        self.api_tags = api_tags
+        self.api_prefix = api_prefix
         self.endpoint = SQLAlchemyEndpointBuilder(
             db_model=db_model,
             db_session=db_session,
@@ -91,7 +95,10 @@ class SQLAlchemyCRUDBuilder:
 
     @cached_property
     def router(self) -> APIRouter:
-        router = APIRouter()
+        router = APIRouter(
+            tags=self.api_tags,
+            prefix=self.api_prefix,
+        )
 
         path: str = "/".join(
             [
