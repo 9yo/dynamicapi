@@ -1,5 +1,5 @@
 from functools import cached_property
-from typing import Any, AsyncContextManager, Callable, Type
+from typing import Any, AsyncGenerator, Callable, Type
 
 from dyapi.entities.pagination import PaginationContainer, PaginationEntity
 from dyapi.implementations.storages.exceptions import AlreadyExistsError, NotFoundError
@@ -117,7 +117,7 @@ class SQLAlchemyEndpointBuilder:
     def __init__(
         self,
         db_model: Type[DeclarativeBase],
-        db_session: AsyncContextManager[AsyncSession],
+        db_session: Callable[[Any], AsyncGenerator[Any, None]],
         schema: Type[BaseModel],
         path_schema: Type[BaseModel],
         filter_schema: Type[BaseModel],

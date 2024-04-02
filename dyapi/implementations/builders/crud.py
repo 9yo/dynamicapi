@@ -1,5 +1,5 @@
 from functools import cached_property
-from typing import AsyncContextManager, Type
+from typing import Any, AsyncGenerator, Callable, Type
 
 from dyapi.entities.config import Config
 from dyapi.implementations.builders.endpoint import SQLAlchemyEndpointBuilder
@@ -9,7 +9,6 @@ from dyapi.interfaces.builders.model import IModelBuilder
 from dyapi.interfaces.storages import IStorageManager
 from fastapi import APIRouter
 from pydantic import BaseModel
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import DeclarativeBase
 
 
@@ -68,7 +67,7 @@ class SQLAlchemyCRUDBuilder:
     def __init__(
         self,
         db_model: Type[DeclarativeBase],
-        db_session: AsyncContextManager[AsyncSession],
+        db_session: Callable[[Any], AsyncGenerator[Any, None]],
         schema: Type[BaseModel],
         update_schema: Type[BaseModel],
         path_schema: Type[BaseModel],
