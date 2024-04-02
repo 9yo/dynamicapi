@@ -4,6 +4,7 @@ from typing import Type
 from dyapi.entities.config import Config, ConfigField
 from dyapi.interfaces.builders.model import IModelBuilder
 from pydantic import BaseModel, create_model
+from sqlalchemy.orm import DeclarativeBase
 
 
 class ModelBuilder(IModelBuilder):
@@ -47,3 +48,53 @@ class ModelBuilder(IModelBuilder):
     @cached_property
     def entity(self) -> Type[BaseModel]:
         return self.create_model(f"EntityModel{self.config.name}", self.config.fields)
+
+
+class SQLAlchemyModelSchemaBuilder:
+    def __init__(
+        self,
+        model: Type[DeclarativeBase],
+    ):
+        self.model = model
+
+    @cached_property
+    def base(self) -> Type[BaseModel]:
+        return create_model(  # type: ignore
+            self.model.__name__ + "Schema",
+            **{
+                key: (value.type.python_type, ...)
+                for key, value in self.model.__table__.columns.items()
+            },
+        )
+
+    @cached_property
+    def path(self) -> Type[BaseModel]:
+        return create_model(  # type: ignore
+            self.model.__name__ + "SchemaIdentifier",
+            **{
+                key: (value.type.python_type, ...)
+                for key, value in self.model.__table__.columns.items()
+                if value.primary_key
+            },
+        )
+
+    @cached_property
+    def filter(self) -> Type[BaseModel]:
+        return create_model(  # type: ignore
+            self.model.__name__ + "FilterSchemaIdentifier",
+            **{
+                key: (value.type.python_type | None, None)
+                for key, value in self.model.__table__.columns.items()
+            },
+        )
+
+    @cached_property
+    def update(self) -> Type[BaseModel]:
+        return create_model(  # type: ignore
+            self.model.__name__ + "UpdateSchema",
+            **{
+                key: (value.type.python_type | None, None)
+                for key, value in self.model.__table__.columns.items()
+                if not value.primary_key
+            },
+        )
