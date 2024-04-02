@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dyapi"
-version = "0.6.0"
+version = "0.9.0"
 description = ""
 authors = ["Artem Bogdanov <abogdaov@gmail.com>"]
 readme = "README.md"
@@ -8,9 +8,10 @@ packages = [{ include = "dyapi", from = "." }]
 
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.9"
 pydantic = "^2.6.4"
-fastapi = "^0.110.0"
+fastapi = "^0.110.1"
+
 
 [tool.poetry.group.examples.dependencies]
 uvicorn = "^0.29.0"
