@@ -62,7 +62,11 @@ class SQLAlchemyModelSchemaBuilder:
         return create_model(  # type: ignore
             self.model.__name__ + "Schema",
             **{
-                key: (value.type.python_type, ...)
+                key: (
+                    (value.type.python_type | None, None)
+                    if value.nullable
+                    else (value.type.python_type, ...)
+                )
                 for key, value in self.model.__table__.columns.items()
             },
         )
@@ -72,7 +76,11 @@ class SQLAlchemyModelSchemaBuilder:
         return create_model(  # type: ignore
             self.model.__name__ + "SchemaIdentifier",
             **{
-                key: (value.type.python_type, ...)
+                key: (
+                    (value.type.python_type | None, None)
+                    if value.nullable
+                    else (value.type.python_type, ...)
+                )
                 for key, value in self.model.__table__.columns.items()
                 if value.primary_key
             },
