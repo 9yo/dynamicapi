@@ -108,6 +108,10 @@ class SQLAlchemyCRUDBuilder:
 
         router.add_api_route("/", self.endpoint.create, methods=["POST"])
 
+        router.add_api_route(
+            "/upsert_many", self.endpoint.upsert_many, methods=["POST"]
+        )
+
         router.add_api_route("/", self.endpoint.list, methods=["GET"])
 
         router.add_api_route(f"/{path}", self.endpoint.get, methods=["GET"])

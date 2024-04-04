@@ -6,6 +6,7 @@ from dyapi.implementations.storages.exceptions import AlreadyExistsError, NotFou
 from dyapi.interfaces.storages import IStorage
 from pydantic import BaseModel
 from sqlalchemy import Table, func, select
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.orm import DeclarativeBase
@@ -135,6 +136,31 @@ class SQLAlchemyStorage:
             if exc.orig.sqlstate == UniqueViolationError.sqlstate:
                 raise AlreadyExistsError from exc
         return model
+
+    @staticmethod
+    async def upsert_many(
+        entities: list[BaseModel],
+        model_type: Type[DeclarativeBase],
+        session: AsyncSession,
+    ) -> list[BaseModel]:
+        stmt = insert(model_type.__table__).values([e.model_dump() for e in entities])
+        pk_fields: list[str] = [
+            field_name
+            for field_name, field_value in model_type.__table__.columns.items()
+            if field_value.primary_key
+        ]
+        regular_fields: list[str] = [
+            field_name
+            for field_name, field_value in model_type.__table__.columns.items()
+            if not field_value.primary_key
+        ]
+        query = stmt.on_conflict_do_update(
+            index_elements=pk_fields,
+            set_={field: getattr(stmt.excluded, field) for field in regular_fields},
+        )
+        await session.execute(query)
+        await session.flush()
+        return entities
 
     @staticmethod
     async def get(

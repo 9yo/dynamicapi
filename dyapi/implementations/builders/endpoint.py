@@ -152,6 +152,20 @@ class SQLAlchemyEndpointBuilder:
         return endpoint
 
     @cached_property
+    def upsert_many(self) -> Callable[[Any], Any]:
+        schema = self.schema
+
+        async def endpoint(
+            entities: list[schema] = Body(...),  # type: ignore
+            session: AsyncSession = Depends(self.db_session),
+        ) -> list[schema]:  # type: ignore
+            return await self.storage.upsert_many(
+                session=session, model_type=self.db_model, entities=entities
+            )
+
+        return endpoint
+
+    @cached_property
     def get(self) -> Callable[[Any], Any]:
         schema = self.schema
 
