@@ -7,7 +7,7 @@ from dyapi.interfaces.builders.crud import ICRUDBuilder
 from dyapi.interfaces.builders.endpoint import IEndpointBuilder
 from dyapi.interfaces.builders.model import IModelBuilder
 from dyapi.interfaces.storages import IStorageManager
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import DeclarativeBase
 
@@ -74,6 +74,7 @@ class SQLAlchemyCRUDBuilder:
         filter_schema: Type[BaseModel],
         api_tags: list[str] | None = None,
         api_prefix: str = "",
+        dependencies: list[Depends] | None = None,
     ):
         """
 
@@ -83,6 +84,7 @@ class SQLAlchemyCRUDBuilder:
         """
         self.api_tags = api_tags
         self.api_prefix = api_prefix
+        self.dependencies = dependencies
         self.endpoint = SQLAlchemyEndpointBuilder(
             db_model=db_model,
             db_session=db_session,
@@ -97,6 +99,7 @@ class SQLAlchemyCRUDBuilder:
         router = APIRouter(
             tags=self.api_tags,
             prefix=self.api_prefix,
+            dependencies=self.dependencies,
         )
 
         path: str = "/".join(

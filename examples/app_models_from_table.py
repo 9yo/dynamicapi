@@ -2,8 +2,9 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 import uvicorn
-from dyapi.implementations.builders.crud import SQLAlchemyCRUDBuilder
-from fastapi import FastAPI, Request
+from dyapi.implementations.builders.api import ModelAPIBuilder
+from fastapi import Depends, FastAPI, Request
+from fastapi.security import HTTPBearer
 from sqlalchemy import URL, Column, MetaData, String
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -14,8 +15,6 @@ from sqlalchemy.ext.asyncio import (
 from sqlalchemy.orm import DeclarativeBase, declarative_base
 
 __all__ = ["metadata"]
-
-from dyapi.implementations.builders.model import SQLAlchemyModelSchemaBuilder
 
 metadata = MetaData()
 
@@ -85,21 +84,35 @@ class ProductModel(Base):
         return f"ProductModel(id={self.id}, name={self.name}"
 
 
-schemas = SQLAlchemyModelSchemaBuilder(model=ProductModel)
+# schemas = SQLAlchemyModelSchemaBuilder(model=ProductModel)
+#
+# router = SQLAlchemyCRUDBuilder(
+#     api_tags=["Product"],
+#     api_prefix="/api/v1/product",
+#     db_model=ProductModel,
+#     db_session=get_db_session,
+#     schema=schemas.base,
+#     path_schema=schemas.path,
+#     filter_schema=schemas.filter,
+#     update_schema=schemas.update,
+# )
+security = HTTPBearer()
 
-router = SQLAlchemyCRUDBuilder(
+
+def authenticate(security_=Depends(security)):  # type: ignore
+    pass
+
+
+router = ModelAPIBuilder(
     api_tags=["Product"],
     api_prefix="/api/v1/product",
-    db_model=ProductModel,
+    model=ProductModel,
     db_session=get_db_session,
-    schema=schemas.base,
-    path_schema=schemas.path,
-    filter_schema=schemas.filter,
-    update_schema=schemas.update,
-)
+    dependencies=[Depends(authenticate)],
+).router
 
 application = FastAPI(lifespan=lifespan)
-application.include_router(router.router)
+application.include_router(router)
 
 if __name__ == "__main__":
     uvicorn.run(
